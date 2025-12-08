@@ -16,6 +16,14 @@ export class UsersService {
     private rolesRepository: Repository<Role>, 
   ) {}
 
+  async findRoleByName(name: string): Promise<Role> {
+    const role = await this.rolesRepository.findOne({ where: { name } });
+    if (!role) {
+      throw new NotFoundException(`Role "${name}" not found.`);
+    }
+    return role;
+  }
+
   /**
    * Hashes the plaintext password using bcryptjs.
    * @param password The plaintext password string.
@@ -50,20 +58,18 @@ export class UsersService {
 
     const hashedPassword = await this.hashPassword(createUserDto.password);
 
-    // 4. Create User Entity
     const newUser = this.usersRepository.create({
       ...createUserDto,
-      password: hashedPassword, // Store the hash
-      roleId: role.id, // Ensure we use the validated Role ID
+      password: hashedPassword, 
+      roleId: role.id, 
     });
 
-    // 5. Save and return (TypeORM will automatically exclude the password field from the return object)
     return this.usersRepository.save(newUser);
   }
 
   findAll(): Promise<User[]> {
     return this.usersRepository.find({
-      relations: ['role'], // Automatically join and load the related Role object
+      relations: ['role'], 
     });
   }
 
@@ -81,7 +87,6 @@ export class UsersService {
   async update(id: string, updateUserDto: UpdateUserDto): Promise<User> {
     const user = await this.findOne(id);
 
-    // If roleId is being updated, validate the new role
     if (updateUserDto.roleId && user.roleId !== updateUserDto.roleId) {
         const role = await this.rolesRepository.findOneBy({ id: updateUserDto.roleId });
         if (!role) {
@@ -90,7 +95,6 @@ export class UsersService {
         user.roleId = role.id;
     }
 
-    // Apply remaining updates (firstName, lastName, email, isActive, etc.)
     this.usersRepository.merge(user, updateUserDto);
     
     return this.usersRepository.save(user);

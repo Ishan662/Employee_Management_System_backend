@@ -4,7 +4,6 @@ import { ExtractJwt, Strategy } from 'passport-jwt';
 import { ConfigService } from '@nestjs/config';
 import { UsersService } from '../users/users.service';
 
-// Define the structure of the JWT payload
 export interface JwtPayload {
   sub: string;
   email: string;

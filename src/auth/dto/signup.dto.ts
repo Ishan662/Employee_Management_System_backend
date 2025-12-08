@@ -1,6 +1,7 @@
-import { IsString, IsNotEmpty, IsEmail, MinLength, IsUUID } from 'class-validator';
 
-export class CreateUserDto {
+import { IsEmail, IsNotEmpty, IsOptional, IsString, MinLength } from 'class-validator';
+
+export class SignupDto {
   @IsEmail({}, { message: 'Must be a valid email address.' })
   @IsNotEmpty()
   email: string;
@@ -10,14 +11,11 @@ export class CreateUserDto {
   firstName: string;
 
   @IsString()
-  lastName: string;
+  @IsOptional()
+  lastName?: string;
 
   @IsString()
   @IsNotEmpty()
   @MinLength(8, { message: 'Password must be at least 8 characters long.' })
   password: string;
-
-  @IsUUID('4', { message: 'roleId must be a valid UUID.' })
-  @IsNotEmpty()
-  roleId: string;
 }
