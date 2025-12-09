@@ -94,6 +94,17 @@ export class UsersService {
     });
   }
 
+  async countAll(): Promise<number> {
+    return this.usersRepository.count();
+  }
+
+  async countByRoleName(name: string): Promise<number> {
+    return this.usersRepository.count({
+      where: { role: { name } },
+      relations: ['role'],
+    });
+  }
+
   async findOne(id: string): Promise<User> {
     const user = await this.usersRepository.findOne({
         where: { id },

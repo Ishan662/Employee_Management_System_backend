@@ -31,6 +31,17 @@ export class UsersController {
     return this.usersService.findAll();
   }
 
+  @Get('/admin/stats')
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
+  async getAdminStats() {
+    const totalUsers = await this.usersService.countAll();
+    const employees = await this.usersService.countByRoleName('Employee');
+    const managers = await this.usersService.countByRoleName('Manager');
+
+    return { totalUsers, employees, managers };
+  }
+
   @Get(':id')
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(Role.ADMIN, Role.MANAGER)
