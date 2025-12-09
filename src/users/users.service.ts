@@ -6,6 +6,7 @@ import { User } from './entities/user.entity';
 import { Role } from '../roles/entities/role.entity';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { CreateUserByRoleDto } from './dto/create-user-by-role.dto';
 
 @Injectable()
 export class UsersService {
@@ -46,11 +47,11 @@ export class UsersService {
 
 
   async create(createUserDto: CreateUserDto): Promise<User> {
-   const existingUser = await this.usersRepository.findOneBy({ email: createUserDto.email });
+    const existingUser = await this.usersRepository.findOneBy({ email: createUserDto.email });
     if (existingUser) {
       throw new ConflictException(`User with email "${createUserDto.email}" already exists.`);
     }
-    
+
     const role = await this.rolesRepository.findOneBy({ id: createUserDto.roleId });
     if (!role) {
       throw new NotFoundException(`Role with ID "${createUserDto.roleId}" not found.`);
@@ -60,8 +61,28 @@ export class UsersService {
 
     const newUser = this.usersRepository.create({
       ...createUserDto,
-      password: hashedPassword, 
-      roleId: role.id, 
+      password: hashedPassword,
+      roleId: role.id,
+    });
+
+    return this.usersRepository.save(newUser);
+  }
+
+  async createUserByRole(dto: CreateUserByRoleDto): Promise<User> {
+    const existingUser = await this.usersRepository.findOneBy({ email: dto.email });
+    if (existingUser) {
+      throw new ConflictException(`User with email "${dto.email}" already exists.`);
+    }
+
+    const role = await this.findRoleByName(dto.roleName);
+    const hashedPassword = await this.hashPassword(dto.password);
+
+    const newUser = this.usersRepository.create({
+      email: dto.email,
+      firstName: dto.firstName,
+      lastName: dto.lastName ?? '',
+      password: hashedPassword,
+      roleId: role.id,
     });
 
     return this.usersRepository.save(newUser);
