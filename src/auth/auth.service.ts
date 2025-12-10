@@ -33,10 +33,13 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials or user is inactive');
     }
 
+    const permissions = user.role.permissions?.map(p => p.name) || [];
+
     const payload = { 
       email: user.email, 
       sub: user.id,
-      role: user.role.name 
+      role: user.role.name,
+      permissions,
     };
     
     return {
@@ -45,7 +48,10 @@ export class AuthService {
         email: user.email,
         firstName: user.firstName,
         lastName: user.lastName,
-        role: user.role.name,
+        role: {
+          name: user.role.name,
+          permissions: user.role.permissions || [],
+        },
       },
       access_token: this.jwtService.sign(payload),
     };
@@ -62,10 +68,13 @@ export class AuthService {
       roleId: employeeRole.id,
     });
 
+    const permissions = employeeRole.permissions?.map(p => p.name) || [];
+
     const payload = {
       email: user.email,
       sub: user.id,
       role: employeeRole.name,
+      permissions,
     };
 
     return {
@@ -74,7 +83,10 @@ export class AuthService {
         email: user.email,
         firstName: user.firstName,
         lastName: user.lastName,
-        role: employeeRole.name,
+        role: {
+          name: employeeRole.name,
+          permissions: employeeRole.permissions || [],
+        },
       },
       access_token: this.jwtService.sign(payload),
     };

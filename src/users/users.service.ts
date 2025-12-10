@@ -18,7 +18,10 @@ export class UsersService {
   ) {}
 
   async findRoleByName(name: string): Promise<Role> {
-    const role = await this.rolesRepository.findOne({ where: { name } });
+    const role = await this.rolesRepository.findOne({ 
+      where: { name },
+      relations: ['permissions'],
+    });
     if (!role) {
       throw new NotFoundException(`Role "${name}" not found.`);
     }
@@ -40,7 +43,8 @@ export class UsersService {
 
       return this.usersRepository.createQueryBuilder('user')
           .addSelect('user.password') 
-          .leftJoinAndSelect('user.role', 'role') 
+          .leftJoinAndSelect('user.role', 'role')
+          .leftJoinAndSelect('role.permissions', 'permissions')
           .where('user.email = :email', { email })
           .getOne();
   }
@@ -90,7 +94,7 @@ export class UsersService {
 
   findAll(): Promise<User[]> {
     return this.usersRepository.find({
-      relations: ['role'], 
+      relations: ['role', 'role.permissions'],
     });
   }
 
@@ -108,7 +112,7 @@ export class UsersService {
   async findOne(id: string): Promise<User> {
     const user = await this.usersRepository.findOne({
         where: { id },
-        relations: ['role']
+        relations: ['role', 'role.permissions']
     });
     if (!user) {
       throw new NotFoundException(`User with ID "${id}" not found`);
