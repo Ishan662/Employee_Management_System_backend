@@ -5,7 +5,7 @@ import { Role } from './role.entity';
 @Entity('permissions')
 export class Permission {
   @PrimaryColumn({ length: 50 }) 
-  name: string; // e.g., 'user:create', 'role:view'
+  name: string; 
 
   @Column({ nullable: true })
   description: string;

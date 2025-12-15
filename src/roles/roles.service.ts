@@ -59,30 +59,19 @@ export class RolesService {
   }
 
   async updateRolePermissions(roleId: string, permissionNames: string[]): Promise<Role> {
-    console.log('Updating role permissions:', { roleId, permissionNames });
-    
     const role = await this.findOne(roleId);
-    console.log('Found role:', role.name, 'Current permissions:', role.permissions.map(p => p.name));
-    
-    if (!permissionNames || permissionNames.length === 0) {
-      // Clear all permissions if empty array
-      console.log('Clearing all permissions');
+
+    if(!permissionNames ||permissionNames.length === 0){
       role.permissions = [];
       return this.rolesRepository.save(role);
     }
-    
-    // Find all permissions by their names
-    const permissions = await this.permissionsRepository.find({
-      where: { name: In(permissionNames) },
-    });
-    
-    console.log('Found permissions to assign:', permissions.map(p => p.name));
 
-    // Update the role's permissions
+    const permissions = await this.permissionsRepository.find({
+      where: {name: In(permissionNames)},
+    });
     role.permissions = permissions;
     const savedRole = await this.rolesRepository.save(role);
-    console.log('Saved role with permissions:', savedRole.permissions.map(p => p.name));
-    
+
     return savedRole;
   }
 }

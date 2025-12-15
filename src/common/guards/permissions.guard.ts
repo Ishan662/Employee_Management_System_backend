@@ -13,7 +13,7 @@ export class PermissionsGuard implements CanActivate {
     );
 
     if (!requiredPermissions || requiredPermissions.length === 0) {
-      return true; // No permissions required
+      return true; 
     }
 
     const request = context.switchToHttp().getRequest();
@@ -23,7 +23,6 @@ export class PermissionsGuard implements CanActivate {
       return false;
     }
 
-    // Check if user has at least one of the required permissions
     return requiredPermissions.some((permission) =>
       user.permissions.includes(permission),
     );

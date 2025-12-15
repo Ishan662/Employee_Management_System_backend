@@ -20,5 +20,5 @@ export class CreateUserByRoleDto {
 
   @IsString()
   @IsNotEmpty()
-  roleName: string; // e.g. 'Employee', 'Manager', 'Admin'
+  roleName: string; 
 }
